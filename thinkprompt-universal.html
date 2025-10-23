@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ThinkPrompt - Professional Prompt Library</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;scroll-behavior:smooth}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 100%);color:#1e293b;line-height:1.6;font-size:16px;min-height:100vh}
 .page-wrapper{max-width:1200px;margin:0 auto;padding:0}
 .brand-header{background:linear-gradient(135deg,#0d9488 0%,#14b8a6 100%);padding:8px 16px;box-shadow:0 8px 32px rgba(13,148,136,.3);color:#fff;text-align:center;border-radius:16px 16px 0 0;margin-bottom:0}
@@ -15,8 +15,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .card:last-child{border-bottom:1px solid rgba(255,255,255,.2)!important;border-radius:0 0 16px 16px!important}
 .copy-success{position:fixed;top:100px;right:20px;background:#10b981;color:#fff;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:600;z-index:2000;transform:translateX(100%);transition:transform .3s ease;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(16,185,129,.4)}
 .copy-success.show{transform:translateX(0)}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:2000}
-.modal-dialog{background:#fff;border-radius:16px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.copy-success.warning{background:#f59e0b}
+.copy-success.error{background:#ef4444}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:2000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease;pointer-events:none;display:flex}
+.modal-overlay.show{opacity:1;visibility:visible;pointer-events:auto}
+.modal-dialog{background:#fff;border-radius:16px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.3);transform:scale(0.9) translateY(-20px);transition:transform .3s ease,opacity .3s ease;opacity:0}
+.modal-overlay.show .modal-dialog{transform:scale(1) translateY(0);opacity:1}
 .subsection{}
 .subsection-header{background:linear-gradient(135deg,#0d9488,#14b8a6);padding:16px 28px}
 .subsection-title{color:#fff;font-family:Impact,'Arial Black',sans-serif;font-size:28px;font-weight:900;letter-spacing:1px;margin:0 0 6px 0;text-align:center;text-shadow:2px 2px 6px rgba(0,0,0,.7)}
@@ -59,13 +63,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .starter-prompt-card:hover{border-color:#14b8a6;box-shadow:0 4px 12px rgba(20,184,166,.1);transform:translateY(-1px)}
 .icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 #libraryList{min-height:200px;overflow-y:auto}
-.prompt-item{display:flex;align-items:center;padding:12px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;background:#fff;cursor:pointer;transition:all .2s}
+.prompt-item{display:flex;align-items:center;padding:12px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;background:#fff;cursor:pointer;transition:all .2s;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .prompt-item:hover{border-color:#14b8a6;box-shadow:0 2px 8px rgba(20,184,166,.1)}
+.prompt-item.active{border-color:#14b8a6;background:linear-gradient(135deg,#f0fdfa,#fff);box-shadow:0 2px 12px rgba(20,184,166,.2);border-width:2px}
 .prompt-checkbox{margin-right:12px}
 .prompt-info{flex:1;cursor:pointer;padding:4px 8px;border-radius:4px;transition:background-color .2s}
 .prompt-info:hover{background-color:rgba(20,184,166,.05)}
 .prompt-title{font-weight:600;color:#1e293b}
 .prompt-date{font-size:12px;color:#64748b;margin-top:4px}
+.action-btn:active,.starter-tab:active{transform:scale(0.98)!important}
+button{transition:all .2s ease}
 </style>
 </head>
 <body>
@@ -91,6 +99,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <text x="180" y="100" font-family="Impact" font-size="88" font-weight="900" fill="#fff" style="text-shadow:2px 2px 6px rgba(0,0,0,.7)">ThinkPrompt</text>
       <text x="180" y="180" font-family="Impact" font-size="88" font-weight="900" fill="#fff" style="text-shadow:2px 2px 6px rgba(0,0,0,.7)">UNIVERSAL LIBRARY</text>
     </svg>
+    <div style="text-align:center; margin-top:12px;">
+      <span style="font-family:Impact,'Arial Black',sans-serif; font-size:20px; font-weight:900; color:#fff; letter-spacing:0.5px; text-shadow:2px 2px 6px rgba(0,0,0,.7);">Stop Bookmarking. Start Organizing.</span>
+    </div>
   </header>
 
   <div class="container">
@@ -159,6 +170,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <section class="card" id="librarySection">
       <div class="workspace-title-container">
         <h2 class="workspace-title">LIBRARY</h2>
+        <button onclick="openQuickGuide()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:2px solid #fff;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s ease;">?</button>
       </div>
       <div class="workspace-actions-container">
         <div class="workspace-actions">
@@ -221,7 +233,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
-<div class="modal-overlay" id="addPromptOverlay" style="display:none">
+<div class="modal-overlay" id="addPromptOverlay">
   <div class="modal-dialog">
     <div class="workspace-title-container">
       <h2 class="workspace-title">ADD NEW PROMPT</h2>
@@ -261,7 +273,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
-<div class="modal-overlay" id="saveModalOverlay" style="display:none">
+<div class="modal-overlay" id="saveModalOverlay">
   <div class="modal-dialog">
     <div class="workspace-title-container">
       <h2 class="workspace-title">Save Prompt</h2>
@@ -284,7 +296,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
-<div class="modal-overlay" id="exportModalOverlay" style="display:none">
+<div class="modal-overlay" id="exportModalOverlay">
   <div class="modal-dialog">
     <div class="workspace-title-container">
       <h2 class="workspace-title">Export Prompt</h2>
@@ -304,7 +316,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
-<div class="modal-overlay" id="updateModalOverlay" style="display:none">
+<div class="modal-overlay" id="updateModalOverlay">
   <div class="modal-dialog">
     <div class="workspace-title-container">
       <h2 class="workspace-title">Update Prompt</h2>
@@ -320,7 +332,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
-<div class="modal-overlay" id="deleteModalOverlay" style="display:none">
+<div class="modal-overlay" id="deleteModalOverlay">
   <div class="modal-dialog">
     <div class="workspace-title-container" style="background:linear-gradient(135deg,#ef4444,#dc2626)">
       <h2 class="workspace-title">DELETE PROMPTS</h2>
@@ -336,6 +348,67 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
+<div class="modal-overlay" id="quickGuideOverlay">
+  <div class="modal-dialog" style="max-width:600px">
+    <div class="workspace-title-container">
+      <h2 class="workspace-title">GETTING STARTED</h2>
+      <button onclick="closeQuickGuide()" style="position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer">&times;</button>
+    </div>
+    <div style="padding:32px;line-height:1.8">
+      <h3 style="font-size:20px;font-weight:700;color:#0d9488;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+        <span style="display:inline-flex;width:32px;height:32px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:8px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(13,148,136,.3)">
+          <svg style="width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </span>
+        Quick Start: Load Sample Prompts
+      </h3>
+      <p style="margin-bottom:24px;color:#374151">New to ThinkPrompt? Click <strong>"Load Prompt Pack"</strong> to import pre-made prompts across all categories. Prompt packs are available on our website - a great way to see how the library works and get started fast!</p>
+
+      <h3 style="font-size:20px;font-weight:700;color:#0d9488;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+        <span style="display:inline-flex;width:32px;height:32px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:8px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(13,148,136,.3)">
+          <svg style="width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </span>
+        Build Your Prompt Library
+      </h3>
+      <p style="margin-bottom:12px;color:#374151"><strong>Collect Prompts You Find Anywhere</strong><br>
+      Found a great prompt on LinkedIn, Twitter, or Reddit? Click <strong>"Add Prompt"</strong> to paste it in, give it a title, choose a category, and save it to your library.</p>
+      <p style="margin-bottom:24px;color:#374151"><strong>Organize & Search</strong><br>
+      Use categories and the search bar to find exactly what you need. Star your favorites for quick access.</p>
+
+      <h3 style="font-size:20px;font-weight:700;color:#0d9488;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+        <span style="display:inline-flex;width:32px;height:32px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:8px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(13,148,136,.3)">
+          <svg style="width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H1m18.2 5.2l-4.2-4.2m0-6l4.2-4.2"/></svg>
+        </span>
+        Develop Better Prompts Through Iteration
+      </h3>
+      <p style="margin-bottom:12px;color:#374151"><strong>The Secret to Great Prompts: Refinement</strong></p>
+      <ol style="margin-left:20px;margin-bottom:12px;color:#374151">
+        <li style="margin-bottom:8px"><strong>Start with a base prompt</strong> - Copy one from your library or add a new one</li>
+        <li style="margin-bottom:8px"><strong>Test it</strong> - Use it with your AI tool and see the results</li>
+        <li style="margin-bottom:8px"><strong>Come back and refine</strong> - Edit the prompt based on what worked and what didn't</li>
+        <li style="margin-bottom:8px"><strong>Save iterations</strong> - Use "Save As New" to keep different versions</li>
+        <li style="margin-bottom:8px"><strong>Compare & improve</strong> - Review your variations to identify what makes prompts effective</li>
+      </ol>
+      <p style="margin-bottom:24px;padding:16px;background:#f0fdfa;border-left:4px solid #14b8a6;border-radius:4px;color:#374151"><strong>Pro Tip:</strong> The best prompts are rarely perfect on the first try. Build a collection of working prompts you can reference and remix.</p>
+
+      <h3 style="font-size:20px;font-weight:700;color:#0d9488;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+        <span style="display:inline-flex;width:32px;height:32px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:8px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(13,148,136,.3)">
+          <svg style="width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </span>
+        Quick Actions
+      </h3>
+      <ul style="margin-left:20px;margin-bottom:16px;color:#374151">
+        <li style="margin-bottom:8px"><strong>Copy</strong> - Grab any prompt to use immediately</li>
+        <li style="margin-bottom:8px"><strong>Edit</strong> - Click into the prompt viewer to modify</li>
+        <li style="margin-bottom:8px"><strong>Update Current</strong> - Save changes to the loaded prompt</li>
+        <li style="margin-bottom:8px"><strong>Save As New</strong> - Create a variation without losing the original</li>
+        <li style="margin-bottom:8px"><strong>Export</strong> - Download prompts as .txt files</li>
+        <li style="margin-bottom:8px"><strong>Backup Library</strong> - Save your entire collection as JSON</li>
+      </ul>
+      <p style="text-align:center;font-weight:600;color:#0d9488;font-size:16px;margin-top:24px">Ready to start? Add your first prompt and begin building your collection!</p>
+    </div>
+  </div>
+</div>
+
 <script>
 const PROMPTS={};
 let currentLoadedPromptId=null;
@@ -343,30 +416,32 @@ let currentLoadedPromptId=null;
 function initializeFavorites(){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');let updated=false;savedPrompts.forEach(prompt=>{if(prompt.favorite===undefined){prompt.favorite=false;updated=true}});if(updated){localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts))}}
 function toggleFavorite(id){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const prompt=savedPrompts.find(p=>p.id==id);if(!prompt)return;prompt.favorite=!prompt.favorite;localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts));const searchTerm=document.getElementById('librarySearch').value;const activeTab=document.querySelector('.starter-tab.active');const currentCategory=activeTab?activeTab.dataset.category:'';renderPromptsList(searchTerm,currentCategory)}
 function loadSystemPrompts(){localStorage.setItem('thinkprompt_saved',JSON.stringify([]))}
-function showCopySuccess(msg){const el=document.getElementById('copySuccess');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
-function saveAsNew(){const text=(document.getElementById('promptDisplay').textContent||'').trim();if(!text){alert('No prompt to save.');return}document.getElementById('saveModalOverlay').style.display='flex';document.getElementById('saveTitle').focus()}
-function updateCurrent(){if(!currentLoadedPromptId){alert('No prompt loaded.');return}const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const prompt=savedPrompts.find(p=>p.id==currentLoadedPromptId);if(!prompt){alert('Prompt not found.');return}document.getElementById('updateMessage').textContent=`Are you sure you want to update "${prompt.title}" with your changes?`;document.getElementById('updateModalOverlay').style.display='flex'}
-function closeUpdateModal(){document.getElementById('updateModalOverlay').style.display='none'}
-function confirmUpdate(){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const prompt=savedPrompts.find(p=>p.id==currentLoadedPromptId);if(!prompt){alert('Prompt not found.');return}const text=document.getElementById('promptDisplay').textContent.trim();prompt.content=text;localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts));closeUpdateModal();showCopySuccess('Prompt updated!');renderPromptsList('','')}
-function closeSaveModal(){document.getElementById('saveModalOverlay').style.display='none';document.getElementById('saveTitle').value='';document.getElementById('saveDescription').value=''}
-function confirmSave(){const title=document.getElementById('saveTitle').value.trim();if(!title){alert('Please enter a title.');return}const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');if(savedPrompts.some(p=>p.title.toLowerCase()===title.toLowerCase())){alert('Title already exists.');return}const text=document.getElementById('promptDisplay').textContent.trim();savedPrompts.push({id:Date.now(),title,description:document.getElementById('saveDescription').value.trim(),content:text,created:new Date().toLocaleDateString(),timestamp:new Date().toISOString(),favorite:false});localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts));closeSaveModal();showCopySuccess('Saved!')}
-function addSinglePrompt(){document.getElementById('newPromptTitle').value='';document.getElementById('newPromptCategory').value='';document.getElementById('newPromptContent').value='';document.getElementById('addPromptOverlay').style.display='flex'}
-function closeAddPromptModal(){document.getElementById('addPromptOverlay').style.display='none'}
-function backupLibrary(){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');if(savedPrompts.length===0){alert('No prompts to backup.');return}const backup=JSON.stringify(savedPrompts,null,2);const blob=new Blob([backup],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`thinkprompt-library-backup-${new Date().toISOString().split('T')[0]}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showCopySuccess('Library backed up!')}
-function loadPromptPack(){const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=event=>{try{const imported=JSON.parse(event.target.result);if(!Array.isArray(imported)){alert('Invalid prompt pack format.');return}const existing=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const combined=[...existing,...imported];localStorage.setItem('thinkprompt_saved',JSON.stringify(combined));showCopySuccess(`Loaded ${imported.length} prompts!`)}catch(err){alert('Error loading prompt pack: '+err.message)}};reader.readAsText(file)};input.click()}
-function saveNewPrompt(){const title=document.getElementById('newPromptTitle').value.trim();const category=document.getElementById('newPromptCategory').value;const content=document.getElementById('newPromptContent').value.trim();if(!title||!category||!content){alert('All fields required.');return}const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');if(savedPrompts.some(p=>p.title.toLowerCase()===title.toLowerCase())){alert('Title exists.');return}savedPrompts.push({id:Date.now(),title,category,content,created:new Date().toLocaleDateString(),timestamp:new Date().toISOString(),author:'You',favorite:false});localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts));closeAddPromptModal();showCopySuccess('Added!');renderPromptsList('','')}
+function showCopySuccess(msg,type='success'){const el=document.getElementById('copySuccess');el.textContent=msg;el.className='copy-success';if(type==='warning'){el.classList.add('warning')}else if(type==='error'){el.classList.add('error')}el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
+function saveAsNew(){const text=(document.getElementById('promptDisplay').textContent||'').trim();if(!text){showCopySuccess('No prompt to save','warning');return}const modal=document.getElementById('saveModalOverlay');setTimeout(()=>modal.classList.add('show'),10);document.getElementById('saveTitle').focus()}
+function updateCurrent(){if(!currentLoadedPromptId){showCopySuccess('No prompt loaded','warning');return}const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const prompt=savedPrompts.find(p=>p.id==currentLoadedPromptId);if(!prompt){showCopySuccess('Prompt not found','error');return}document.getElementById('updateMessage').textContent=`Are you sure you want to update "${prompt.title}" with your changes?`;const modal=document.getElementById('updateModalOverlay');setTimeout(()=>modal.classList.add('show'),10)}
+function closeUpdateModal(){document.getElementById('updateModalOverlay').classList.remove('show')}
+function confirmUpdate(){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const prompt=savedPrompts.find(p=>p.id==currentLoadedPromptId);if(!prompt){showCopySuccess('Prompt not found','error');return}const text=document.getElementById('promptDisplay').textContent.trim();prompt.content=text;localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts));closeUpdateModal();showCopySuccess('Prompt updated!');renderPromptsList('','')}
+function closeSaveModal(){document.getElementById('saveModalOverlay').classList.remove('show');document.getElementById('saveTitle').value='';document.getElementById('saveDescription').value=''}
+function confirmSave(){const title=document.getElementById('saveTitle').value.trim();if(!title){showCopySuccess('Please enter a title','warning');return}const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');if(savedPrompts.some(p=>p.title.toLowerCase()===title.toLowerCase())){showCopySuccess('Title already exists','warning');return}const text=document.getElementById('promptDisplay').textContent.trim();savedPrompts.push({id:Date.now(),title,description:document.getElementById('saveDescription').value.trim(),content:text,created:new Date().toLocaleDateString(),timestamp:new Date().toISOString(),favorite:false});localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts));closeSaveModal();showCopySuccess('Saved!')}
+function addSinglePrompt(){document.getElementById('newPromptTitle').value='';document.getElementById('newPromptCategory').value='';document.getElementById('newPromptContent').value='';const modal=document.getElementById('addPromptOverlay');setTimeout(()=>modal.classList.add('show'),10)}
+function closeAddPromptModal(){document.getElementById('addPromptOverlay').classList.remove('show')}
+function backupLibrary(){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');if(savedPrompts.length===0){showCopySuccess('No prompts to backup','warning');return}const backup=JSON.stringify(savedPrompts,null,2);const blob=new Blob([backup],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`thinkprompt-library-backup-${new Date().toISOString().split('T')[0]}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showCopySuccess('Library backed up!')}
+function loadPromptPack(){const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=event=>{try{const imported=JSON.parse(event.target.result);if(!Array.isArray(imported)){showCopySuccess('Invalid prompt pack format','error');return}const existing=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const combined=[...existing,...imported];localStorage.setItem('thinkprompt_saved',JSON.stringify(combined));showCopySuccess(`Loaded ${imported.length} prompts!`);renderPromptsList('','')}catch(err){showCopySuccess('Error loading prompt pack','error')}};reader.readAsText(file)};input.click()}
+function saveNewPrompt(){const title=document.getElementById('newPromptTitle').value.trim();const category=document.getElementById('newPromptCategory').value;const content=document.getElementById('newPromptContent').value.trim();if(!title||!category||!content){showCopySuccess('All fields required','warning');return}const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');if(savedPrompts.some(p=>p.title.toLowerCase()===title.toLowerCase())){showCopySuccess('Title already exists','warning');return}savedPrompts.push({id:Date.now(),title,category,content,created:new Date().toLocaleDateString(),timestamp:new Date().toISOString(),author:'You',favorite:false});localStorage.setItem('thinkprompt_saved',JSON.stringify(savedPrompts));closeAddPromptModal();showCopySuccess('Added!');renderPromptsList('','')}
 function showLibrary(categoryFilter=''){const categoryNames={'favorites':'Favorites','business':'Business','career':'Career','creative':'Creative','support':'Support','data':'Data','education':'Education','email':'Email','social':'Social','technical':'Technical','video':'Video','misc':'Miscellaneous'};const titleText=categoryFilter?`LIBRARY - ${categoryNames[categoryFilter]}`:'LIBRARY';document.querySelector('#librarySection .workspace-title').textContent=titleText;renderPromptsList('',categoryFilter)}
-function renderPromptsList(searchTerm='',categoryFilter=''){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const list=document.getElementById('libraryList');if(savedPrompts.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:#64748b"><div style="font-size:48px">📂</div><h3>No prompts yet</h3></div>';return}let filtered=savedPrompts.filter(p=>p.title.toLowerCase().includes(searchTerm.toLowerCase())||p.content.toLowerCase().includes(searchTerm.toLowerCase()));if(categoryFilter==='favorites'){filtered=filtered.filter(p=>p.favorite===true)}else if(categoryFilter){filtered=filtered.filter(p=>p.category===categoryFilter)}if(filtered.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:#64748b"><h3>No prompts in this category</h3></div>';return}list.innerHTML=filtered.map(p=>`<div class="prompt-item"><div onclick="event.stopPropagation()"><input type="checkbox" class="prompt-checkbox" data-prompt-id="${p.id}"></div><div class="prompt-info" onclick="loadPromptFromLibrary('${p.id}')"><div style="display: flex; align-items: center; gap: 8px;"><span onclick="event.stopPropagation(); toggleFavorite('${p.id}')" style="cursor: pointer; font-size: 18px; user-select: none;">${p.favorite?'★':'☆'}</span><div style="flex: 1;"><div class="prompt-title">${p.title}</div><div class="prompt-date">${p.created}</div></div></div></div></div>`).join('')}
-function loadPromptFromLibrary(id){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const prompt=savedPrompts.find(p=>p.id==id);if(!prompt){alert('Not found.');return}const display=document.getElementById('promptDisplay');display.innerHTML='';const pre=document.createElement('pre');pre.style.whiteSpace='pre-wrap';pre.style.fontFamily='inherit';pre.style.margin='0';pre.textContent=prompt.content;display.appendChild(pre);currentLoadedPromptId=id;const updateBtn=document.getElementById('updateCurrentBtn');updateBtn.style.opacity='1';updateBtn.style.cursor='pointer'}
-function deleteSelectedPrompts(){const checkboxes=document.querySelectorAll('.prompt-checkbox:checked');const selectedIds=Array.from(checkboxes).map(cb=>cb.dataset.promptId);if(selectedIds.length===0){alert('No prompts selected.');return}const count=selectedIds.length;document.getElementById('deleteMessage').textContent=`Are you sure you want to delete ${count} selected prompt${count>1?'s':''}? This cannot be undone.`;document.getElementById('deleteModalOverlay').style.display='flex'}
-function closeDeleteModal(){document.getElementById('deleteModalOverlay').style.display='none'}
+function renderPromptsList(searchTerm='',categoryFilter=''){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const list=document.getElementById('libraryList');if(savedPrompts.length===0){list.innerHTML='<div style="text-align:center;padding:40px;border:2px solid #14b8a6;border-radius:12px;margin:20px;background:rgba(20,184,166,0.05)"><h3 style="color:#0d9488;font-size:18px;font-weight:700;margin-bottom:8px">Library Empty</h3><p style="color:#64748b;font-size:14px">Add prompts or import a pack to begin organizing.</p></div>';return}let filtered=savedPrompts.filter(p=>p.title.toLowerCase().includes(searchTerm.toLowerCase())||p.content.toLowerCase().includes(searchTerm.toLowerCase()));if(categoryFilter==='favorites'){filtered=filtered.filter(p=>p.favorite===true)}else if(categoryFilter){filtered=filtered.filter(p=>p.category===categoryFilter)}if(filtered.length===0){list.innerHTML='<div style="text-align:center;padding:40px;color:#64748b"><h3>No prompts in this category</h3></div>';return}list.innerHTML=filtered.map(p=>`<div class="prompt-item"><div onclick="event.stopPropagation()"><input type="checkbox" class="prompt-checkbox" data-prompt-id="${p.id}"></div><div class="prompt-info" onclick="loadPromptFromLibrary('${p.id}')"><div style="display: flex; align-items: center; gap: 8px;"><span onclick="event.stopPropagation(); toggleFavorite('${p.id}')" style="cursor: pointer; font-size: 18px; user-select: none;">${p.favorite?'★':'☆'}</span><div style="flex: 1;"><div class="prompt-title">${p.title}</div><div class="prompt-date">${p.created}</div></div></div></div></div>`).join('')}
+function loadPromptFromLibrary(id){const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const prompt=savedPrompts.find(p=>p.id==id);if(!prompt){showCopySuccess('Prompt not found','error');return}const display=document.getElementById('promptDisplay');display.innerHTML='';const pre=document.createElement('pre');pre.style.whiteSpace='pre-wrap';pre.style.fontFamily='inherit';pre.style.margin='0';pre.textContent=prompt.content;display.appendChild(pre);currentLoadedPromptId=id;const updateBtn=document.getElementById('updateCurrentBtn');updateBtn.style.opacity='1';updateBtn.style.cursor='pointer';document.querySelectorAll('.prompt-item').forEach(item=>item.classList.remove('active'));event.target.closest('.prompt-item').classList.add('active')}
+function deleteSelectedPrompts(){const checkboxes=document.querySelectorAll('.prompt-checkbox:checked');const selectedIds=Array.from(checkboxes).map(cb=>cb.dataset.promptId);if(selectedIds.length===0){showCopySuccess('No prompts selected','warning');return}const count=selectedIds.length;document.getElementById('deleteMessage').textContent=`Are you sure you want to delete ${count} selected prompt${count>1?'s':''}? This cannot be undone.`;const modal=document.getElementById('deleteModalOverlay');setTimeout(()=>modal.classList.add('show'),10)}
+function closeDeleteModal(){document.getElementById('deleteModalOverlay').classList.remove('show')}
 function confirmDelete(){const checkboxes=document.querySelectorAll('.prompt-checkbox:checked');const selectedIds=Array.from(checkboxes).map(cb=>cb.dataset.promptId);const savedPrompts=JSON.parse(localStorage.getItem('thinkprompt_saved')||'[]');const remaining=savedPrompts.filter(p=>!selectedIds.includes(p.id.toString()));localStorage.setItem('thinkprompt_saved',JSON.stringify(remaining));closeDeleteModal();renderPromptsList('','');showCopySuccess('Deleted!')}
-function copyPrompt(){const text=document.getElementById('promptDisplay').textContent.trim();if(text){navigator.clipboard.writeText(text).then(()=>showCopySuccess('Copied to clipboard!'))}else{alert('No prompt to copy.')}}
-function editPrompt(){document.getElementById('promptDisplay').focus();alert('You can now edit the prompt.')}
-function exportPrompt(){const text=document.getElementById('promptDisplay').textContent;if(text&&text.trim()){document.getElementById('exportFilename').value='thinkprompt-'+new Date().toISOString().split('T')[0];document.getElementById('exportModalOverlay').style.display='flex';document.getElementById('exportFilename').focus()}else{alert('No prompt to export.')}}
-function closeExportModal(){document.getElementById('exportModalOverlay').style.display='none';document.getElementById('exportFilename').value=''}
-function confirmExport(){const filename=document.getElementById('exportFilename').value.trim();if(!filename){alert('Please enter a filename.');return}const text=document.getElementById('promptDisplay').textContent.trim();const blob=new Blob([text],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`${filename}.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);closeExportModal();showCopySuccess('Exported!')}
+function copyPrompt(){const text=document.getElementById('promptDisplay').textContent.trim();if(text){navigator.clipboard.writeText(text).then(()=>showCopySuccess('Copied to clipboard!'))}else{showCopySuccess('No prompt to copy','warning')}}
+function editPrompt(){document.getElementById('promptDisplay').focus();showCopySuccess('Click to edit prompt')}
+function exportPrompt(){const text=document.getElementById('promptDisplay').textContent;if(text&&text.trim()){document.getElementById('exportFilename').value='thinkprompt-'+new Date().toISOString().split('T')[0];const modal=document.getElementById('exportModalOverlay');setTimeout(()=>modal.classList.add('show'),10);document.getElementById('exportFilename').focus()}else{showCopySuccess('No prompt to export','warning')}}
+function closeExportModal(){document.getElementById('exportModalOverlay').classList.remove('show');document.getElementById('exportFilename').value=''}
+function confirmExport(){const filename=document.getElementById('exportFilename').value.trim();if(!filename){showCopySuccess('Please enter a filename','warning');return}const text=document.getElementById('promptDisplay').textContent.trim();const blob=new Blob([text],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`${filename}.txt`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);closeExportModal();showCopySuccess('Exported!')}
 function switchStarter(filter){showLibrary(filter);document.querySelectorAll('.starter-tab').forEach(t=>t.classList.remove('active'));document.querySelector(`[data-category="${filter}"]`).classList.add('active')}
+function openQuickGuide(){const modal=document.getElementById('quickGuideOverlay');setTimeout(()=>modal.classList.add('show'),10)}
+function closeQuickGuide(){document.getElementById('quickGuideOverlay').classList.remove('show')}
 document.addEventListener('DOMContentLoaded',()=>{initializeFavorites();loadSystemPrompts();document.querySelectorAll('.starter-tab').forEach(tab=>{tab.addEventListener('click',()=>switchStarter(tab.dataset.category))});document.getElementById('librarySearch').addEventListener('input',e=>renderPromptsList(e.target.value));document.getElementById('deleteSelected').addEventListener('click',deleteSelectedPrompts);document.querySelectorAll('.starter-tab').forEach(t=>t.classList.remove('active'))});
 </script>
 </body>
